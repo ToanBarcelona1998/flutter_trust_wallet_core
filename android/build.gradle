@@ -2,14 +2,15 @@ group 'com.memtopia.trust_wallet_core'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.7.10'
+    ext.kotlin_version = '1.9.0'
     repositories {
         google()
         mavenCentral()
+        mavenLocal()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.2.0'
+        classpath 'com.android.tools.build:gradle:8.0.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -18,13 +19,7 @@ rootProject.allprojects {
     repositories {
         google()
         mavenCentral()
-        maven {
-            url = uri("https://maven.pkg.github.com/trustwallet/wallet-core")
-            credentials {
-                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
-                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
-            }
-        }
+        mavenLocal()
     }
 }
 
@@ -32,10 +27,11 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 32
-
+    namespace 'com.memtopia.trust_wallet_core'
+    compileSdk 33
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
+        main.jniLibs.srcDirs += 'libs/jni'
     }
     defaultConfig {
         minSdkVersion 23
@@ -44,5 +40,5 @@ android {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation "com.trustwallet:wallet-core:3.1.27"
+    implementation fileTree(include: ['*.jar','*.so'], dir: 'libs')
 }
