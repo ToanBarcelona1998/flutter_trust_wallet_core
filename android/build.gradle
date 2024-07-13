@@ -2,16 +2,22 @@ group 'com.memtopia.trust_wallet_core'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.9.0'
+    ext.kotlin_version = "1.7.10"
     repositories {
         google()
         mavenCentral()
-        mavenLocal()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.0.2'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath("com.android.tools.build:gradle:7.3.0")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
     }
 }
 
@@ -23,22 +29,54 @@ rootProject.allprojects {
     }
 }
 
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
+apply plugin: "com.android.library"
+apply plugin: "kotlin-android"
 
 android {
-    namespace 'com.memtopia.trust_wallet_core'
-    compileSdk 33
+    if (project.android.hasProperty("namespace")) {
+        namespace = "com.memtopia.trust_wallet_core"
+    }
+
+    compileSdk 34
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
         main.jniLibs.srcDirs += 'libs/jni'
     }
-    defaultConfig {
-        minSdkVersion 23
-    }
-}
 
-dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation fileTree(include: ['*.jar','*.so'], dir: 'libs')
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    sourceSets {
+        main.java.srcDirs += "src/main/kotlin"
+        test.java.srcDirs += "src/test/kotlin"
+    }
+
+    defaultConfig {
+        minSdk = 21
+    }
+
+    dependencies {
+        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+        implementation fileTree(include: ['*.jar','*.so'], dir: 'libs')
+        testImplementation("org.jetbrains.kotlin:kotlin-test")
+        testImplementation("org.mockito:mockito-core:5.0.0")
+    }
+
+    testOptions {
+        unitTests.all {
+            useJUnitPlatform()
+
+            testLogging {
+                events "passed", "skipped", "failed", "standardOut", "standardError"
+                outputs.upToDateWhen {false}
+                showStandardStreams = true
+            }
+        }
+    }
 }
